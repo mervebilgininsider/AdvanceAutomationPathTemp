@@ -14,6 +14,7 @@ pipeline {
     environment {
         GITHUB_TOKEN = credentials('github-token')
         PYTHONPATH = "${WORKSPACE}"
+        PATH = "/opt/homebrew/bin:/usr/local/bin:$PATH"
     }
     
     stages {
@@ -21,8 +22,18 @@ pipeline {
             steps {
                 echo 'Setting up test environment...'
                 sh '''
-                    python -m venv venv
+                    # Python'u bul
+                    PYTHON_PATH=$(which python3)
+                    echo "Python path: $PYTHON_PATH"
+                    
+                    # Python'u yükle
+                    $PYTHON_PATH -m venv venv
                     . venv/bin/activate
+                    
+                    # pip'i yükselt
+                    pip install --upgrade pip
+                    
+                    # Gereksinimleri yükle
                     pip install -r requirements.txt
                 '''
             }
@@ -97,15 +108,6 @@ pipeline {
             echo 'Archiving test reports and screenshots...'
             archiveArtifacts artifacts: 'reports/**/*', allowEmptyArchive: true
             archiveArtifacts artifacts: 'screenshots/**/*', allowEmptyArchive: true
-            
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'reports',
-                reportFiles: 'report.html',
-                reportName: 'Test Report'
-            ])
             
             // Clean up workspace
             cleanWs()
