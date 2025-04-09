@@ -15,6 +15,7 @@ pipeline {
         GITHUB_TOKEN = credentials('github-token')
         PYTHONPATH = "${WORKSPACE}"
         PATH = "/opt/homebrew/bin:/usr/local/bin:$PATH"
+        SCREENSHOT_DIR = "${WORKSPACE}/screenshots"
     }
     
     stages {
@@ -37,7 +38,7 @@ pipeline {
                     pip install -r requirements.txt
                     
                     # Pytest ve gerekli eklentileri yükle
-                    pip install pytest pytest-html pytest-selenium pytest-selenium-screenshots
+                    pip install pytest pytest-html pytest-selenium
                     
                     # Screenshots dizinini oluştur
                     mkdir -p screenshots
@@ -53,9 +54,7 @@ pipeline {
                     python -m pytest tests/ \
                         --html=reports/report.html \
                         --self-contained-html \
-                        --capture=tee-sys \
-                        --screenshots-dir=screenshots \
-                        --screenshots-on-failure
+                        --capture=tee-sys
                 '''
             }
         }
