@@ -22,6 +22,10 @@ pipeline {
             steps {
                 echo 'Setting up test environment...'
                 sh '''
+                    # Çalışma dizinini kontrol et
+                    pwd
+                    ls -la
+                    
                     # Python'u bul
                     PYTHON_PATH=$(which python3)
                     echo "Python path: $PYTHON_PATH"
@@ -39,8 +43,12 @@ pipeline {
                     # Pytest ve gerekli eklentileri yükle
                     pip install pytest pytest-html pytest-selenium
                     
-                    # Screenshots dizinini oluştur
+                    # Screenshots ve reports dizinlerini oluştur
                     mkdir -p screenshots
+                    mkdir -p reports
+                    
+                    # Test dizinini kontrol et
+                    ls -la tests/
                 '''
             }
         }
@@ -50,11 +58,23 @@ pipeline {
                 echo 'Running Selenium tests...'
                 sh '''
                     . venv/bin/activate
-                    python -m pytest tests/ \
-                        --html=reports/report.html \
+                    
+                    # Test dizininin varlığını kontrol et
+                    if [ ! -d "tests" ]; then
+                        echo "ERROR: 'tests' directory not found!"
+                        exit 1
+                    fi
+                    
+                    # Dizindeki test dosyalarını listele
+                    echo "Test files:"
+                    ls -la tests/
+                    
+                    # Tırnak içinde path kullanarak testleri çalıştır
+                    python -m pytest "tests/" \
+                        --html="reports/report.html" \
                         --self-contained-html \
                         --capture=tee-sys \
-                        --screenshots-dir=${SCREENSHOT_DIR}
+                        --screenshots-dir="${SCREENSHOT_DIR}"
                 '''
             }
         }
