@@ -35,6 +35,12 @@ pipeline {
                     
                     # Gereksinimleri yükle
                     pip install -r requirements.txt
+                    
+                    # Pytest ve gerekli eklentileri yükle
+                    pip install pytest pytest-html pytest-selenium
+                    
+                    # Screenshots dizinini oluştur
+                    mkdir -p screenshots
                 '''
             }
         }
