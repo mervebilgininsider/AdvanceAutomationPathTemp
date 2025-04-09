@@ -12,7 +12,6 @@ pipeline {
     }
     
     environment {
-        GITHUB_TOKEN = credentials('github-token')
         PYTHONPATH = "${WORKSPACE}"
         PATH = "/opt/homebrew/bin:/usr/local/bin:$PATH"
         SCREENSHOT_DIR = "${WORKSPACE}/screenshots"
@@ -54,7 +53,8 @@ pipeline {
                     python -m pytest tests/ \
                         --html=reports/report.html \
                         --self-contained-html \
-                        --capture=tee-sys
+                        --capture=tee-sys \
+                        --screenshots-dir=${SCREENSHOT_DIR}
                 '''
             }
         }
@@ -62,7 +62,7 @@ pipeline {
         stage('Upload Results') {
             steps {
                 echo 'Uploading test results to GitHub...'
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GITHUB_USER', passwordVariable: 'GITHUB_TOKEN')]) {
                     sh '''
                         . venv/bin/activate
                         python -c "
