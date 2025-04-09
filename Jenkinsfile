@@ -37,7 +37,7 @@ pipeline {
                     pip install -r requirements.txt
                     
                     # Pytest ve gerekli eklentileri yükle
-                    pip install pytest pytest-html pytest-selenium
+                    pip install pytest pytest-html pytest-selenium pytest-selenium-screenshots
                     
                     # Screenshots dizinini oluştur
                     mkdir -p screenshots
@@ -54,7 +54,8 @@ pipeline {
                         --html=reports/report.html \
                         --self-contained-html \
                         --capture=tee-sys \
-                        --screenshots-dir=screenshots
+                        --screenshots-dir=screenshots \
+                        --screenshots-on-failure
                 '''
             }
         }
